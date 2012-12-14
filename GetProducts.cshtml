@@ -1,0 +1,9 @@
+﻿@{
+    Layout = null;
+    var categoryId = UrlData[0].IsEmpty() ? 1 : UrlData[0].AsInt();  
+    var db = Database.Open("Northwind");
+    var sql = "SELECT ProductId, ProductName FROM Products WHERE CategoryId = @0 ORDER BY ProductName";
+    var products = db.Query(sql, categoryId);
+    Json.Write(products, Response.Output);
+}
+

@@ -1,0 +1,53 @@
+﻿@{
+    var db = Database.Open("Northwind");
+    var categories = db.Query("SELECT CategoryId, CategoryName FROM Categories ORDER BY CategoryName");
+}
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Cascading Dropdowns</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.1.min.js" type="text/javascript"></script>
+        <script>
+            $(function () {
+                var productsSelect = $('#productId');
+                productsSelect.attr('disabled', true);
+                $('#categoryId').change(function () {
+                    var categoryId = $(this).val();
+                    $.getJSON('/GetProducts/' + categoryId, function (products) {
+                        productsSelect.attr('disabled', false);
+                        productsSelect.empty();
+                        productsSelect.append(
+                                $('<option/>')
+                                    .attr('value', '')
+                                    .text('-- Select Product --'));
+                        $.each(products, function (index, product) {
+                            productsSelect.append(
+                                $('<option/>')
+                                    .attr('value', product.ProductId)
+                                    .text(product.ProductName)
+                            );
+                        });
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div>
+            <select id="categoryId" name="categoryId">
+                <option value="">-- Select Category --</option>
+            @foreach(var category in categories){
+                <option value="@category.CategoryId">@category.CategoryName</option>
+            }
+            </select>
+        </div>
+        <div>
+            <select id="productId">
+                <option value="">-- Select Product --</option>
+            </select>
+        </div>
+    </body>
+</html>

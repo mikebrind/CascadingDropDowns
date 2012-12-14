@@ -1,0 +1,51 @@
+﻿@{
+    var db = Database.Open("Northwind");
+    var data = db.Query("SELECT CategoryId, CategoryName FROM Categories ORDER BY CategoryName");
+    var categories = data.Select(item => new SelectListItem {
+        Value = item.CategoryId.ToString(), 
+        Text = item.CategoryName
+    });
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Cascading Dropdown Lists</title>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.1.min.js" type="text/javascript"></script>
+        <script>
+            $(function () {
+                var productsSelect = $('#productId');
+                productsSelect.attr('disabled', true);
+                $('#categoryId').change(function () {
+                    var categoryId = $(this).val();
+                    $.getJSON('/GetProducts/' + categoryId, function (products) {
+                        productsSelect.attr('disabled', false);
+                        productsSelect.empty();
+                        productsSelect.append(
+                                $('<option/>')
+                                    .attr('value', '')
+                                    .text('-- Select Product --'));
+                        $.each(products, function (index, product) {
+                            productsSelect.append(
+                                $('<option/>')
+                                    .attr('value', product.ProductId)
+                                    .text(product.ProductName)
+                            );
+                        });
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div>
+            @Html.DropDownList("categoryId", "-- Select Category --", categories)
+        </div>
+        <div>
+            @Html.DropDownList("productId", "-- Select Product --", Enumerable.Empty<SelectListItem>())
+        </div>
+    </body>
+</html>
+
